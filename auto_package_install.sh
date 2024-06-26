@@ -24,17 +24,27 @@ install_package() {
 
 }
 
+#---------------------Check IF the repo name exists-----------------------------
+available_repo(){
+
+        sudo ls /etc/yum.repos.d/|egrep "$1" &> /dev/null
+
+}
+
 
 #-----------------------create repo if the function is not in the repo------------
 
 create_repo() {
 
 	read -p "Enter your repository file name (NO .repo extention is needed): " REPO_NAME
+if available_repo $REPO_NAME ;then
+	echo "File already exists."
+else
 	read -p "Enter what you want to identify this repo as: " REPO_ID
 	read -p "Enter repo name: " REPO_DESCRIPTION
 	read -p "Enter BaseURL: " REPO_BASEURL
-	read -p "Will this repo be enabled? 1- yes, 2- No :" REPO_ENABLED
-	read -p "Do you want to check the GPG key? 1- yes, 2- No" REPO_GPGCHECK
+	read -p "Will this repo be enabled? 1- yes, 2- No: " REPO_ENABLED
+	read -p "Do you want to check the GPG key? 1- yes, 2- No: " REPO_GPGCHECK
 	read -p "Enter your GPG key url: " REPO_GPGKEY
 
 	#repo file locating 
@@ -42,18 +52,17 @@ create_repo() {
 
 	#Create Repo file
 	cat <<EOF > ${REPO_FILE}
-[${REPO_ID}]
-name=$REPO_DESCRIPTION
-baseurl=$REPO_BASEURL
-enabled=$REPO_ENABLED
-gpgcheck=$REPO_GPGCHECK
-gpgkey=$REPO_GPGKEY
+	[${REPO_ID}]
+	name=$REPO_DESCRIPTION
+	baseurl=$REPO_BASEURL
+	enabled=$REPO_ENABLED
+	gpgcheck=$REPO_GPGCHECK
+	gpgkey=$REPO_GPGKEY
 EOF
 
 	echo "Repository file ${REPO_FILE} created successfully"
-
+fi
 }
-
 read -p "Enter your package name: " package_name
 
 
